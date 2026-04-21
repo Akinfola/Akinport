@@ -1,0 +1,20 @@
+# dependencies
+node_modules/
+
+# env files (VERY IMPORTANT)
+.env
+.env.local
+.env.*.local
+
+# optional example file (this one CAN be pushed if it has no secrets)
+.env.local.example
+
+# build files
+.next/
+out/
+dist/
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
