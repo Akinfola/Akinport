@@ -121,16 +121,15 @@ contactRouter.post(
 
       // ─── Auto-reply to sender ──────────────────────────────
       await transporter.sendMail({
-        from: `"Akintek⚡" <${process.env.SMTP_USER}>`,
+        from: `"AKINTEK⚡" <${process.env.SMTP_USER}>`,
         to: email,
         subject: `Re: ${subject}`,
         html: `
           <div style="font-family:sans-serif;max-width:600px;margin:auto">
             <p>Hi ${name},</p>
             <p>Thanks for reaching out! I've received your message and will reply as soon as possible.</p>
-            <p style="color:#6b7280;font-size:0.875rem">You wrote: <em>${subject}</em></p>
             <br/>
-            <p>Best regards,<br/><strong>EJIDE Ayodele David</strong></p>
+            <p>Best regards,<br/><strong>Akintek⚡</strong></p>
           </div>
         `,
       });
