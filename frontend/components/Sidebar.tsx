@@ -56,12 +56,12 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
     <aside id="sidebar" className={isOpen ? 'active' : ''}>
       {/* Profile */}
       <div className="flex flex-col items-center py-8">
-        <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-[#2c2f3f] mb-3">
+        <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-[#2c2f3f] mb-3">
           <Image
-            src="assests/hero.jpg"
-            alt="Ejide Ayodele David"
-            width={96}
-            height={96}
+            src= "/assets/sidebar.jpeg"
+            alt="Alex Smith"
+            width={160}
+            height={160}
             className="object-cover w-full h-full"
             unoptimized
           />
