@@ -167,7 +167,8 @@ body {
   height: 100vh;
   background: url('/assets/background.jpeg') top center;
   background-size: cover;
-  background-position: bottom 60% center;
+  background-position: bottom 75% center;
+  background-attachment: fixed;
   position: relative;
 }
 
