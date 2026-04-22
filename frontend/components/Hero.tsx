@@ -47,7 +47,7 @@ export default function Hero() {
       style={{ minHeight: '100vh' }}
     >
       <div className="hero-container text-center px-4">
-        <h1 className="mb-4">Alex Smith</h1>
+        <h1 className="mb-4">Ejide Ayodele David</h1>
         <p>
           I&apos;m{' '}
           <span>

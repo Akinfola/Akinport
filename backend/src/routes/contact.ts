@@ -134,7 +134,7 @@ contactRouter.post(
             <p>Hi ${name},</p>
             <p>Thanks for reaching out! I've received your message and will reply as soon as possible.</p>
             <br/>
-            <p>Best regards,<br/><strong>Akintek⚡</strong></p>
+            <p>Best regards,<br/><strong>Akintek</strong></p>
           </div>
         `,
       });

@@ -58,8 +58,8 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       <div className="flex flex-col items-center py-8">
         <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-[#2c2f3f] mb-3">
           <Image
-            src="https://themewagon.github.io/iPortfolio/assets/img/my-profile-img.jpg"
-            alt="Alex Smith"
+            src="assests/hero.jpg"
+            alt="Ejide Ayodele David"
             width={96}
             height={96}
             className="object-cover w-full h-full"
