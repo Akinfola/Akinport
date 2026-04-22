@@ -23,20 +23,24 @@ const validateContact = [
     .trim()
     .notEmpty()
     .withMessage("Name is required")
-    .isLength({ min: 2, max: 100 }),
+    .isLength({ min: 2, max: 100 })
+    .withMessage("Name must be at least 2 characters long."),
 
   body("email")
     .trim()
     .notEmpty()
     .withMessage("Email is required")
     .isEmail()
-    .withMessage("Invalid email"),
+    .withMessage("Invalid email")
+    .withMessage("Please enter a valid email address."),
+
 
   body("subject")
     .trim()
     .notEmpty()
     .withMessage("Subject is required")
-    .isLength({ min: 3, max: 200 }),
+    .isLength({ min: 3, max: 200 })
+    .withMessage("Subject must be at least 3 characters long."),
 
   body("message")
     .trim()
