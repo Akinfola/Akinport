@@ -59,7 +59,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-[#2c2f3f] mb-3">
           <Image
             src= "/assets/sidebar.jpeg"
-            alt="Alex Smith"
+            alt="Ejide Ayodele"
             width={160}
             height={160}
             className="object-cover w-full h-full"
@@ -75,23 +75,23 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
               handleNavClick('#hero');
             }}
           >
-            Alex Smith
+            Ejide Ayodele David
           </a>
         </h1>
 
         {/* Social Links */}
         <div className="social-links flex gap-2 mt-4">
-          <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" title="Twitter">
+          <a href="https://twitter.com/Hakin_Fola" target="_blank" rel="noopener noreferrer" title="Twitter">
             <i className="bi bi-twitter-x" />
           </a>
-          <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" title="Facebook">
+          <a href="https://facebook.com/akin.fola.885709" target="_blank" rel="noopener noreferrer" title="Facebook">
             <i className="bi bi-facebook" />
           </a>
-          <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" title="Instagram">
+          <a href="https://instagram.com/iam_akinfola" target="_blank" rel="noopener noreferrer" title="Instagram">
             <i className="bi bi-instagram" />
           </a>
-          <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" title="LinkedIn">
-            <i className="bi bi-linkedin" />
+          <a href="https://github.com/Akinfola" target="_blank" rel="noopener noreferrer" title="GitHub">
+            <i className="bi bi-github" />
           </a>
         </div>
       </div>

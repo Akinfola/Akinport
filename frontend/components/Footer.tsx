@@ -11,10 +11,9 @@ export default function Footer() {
       </div>
       <div className="credits">
         Designed by{' '}
-        <a href="https://bootstrapmade.com/" target="_blank" rel="noopener noreferrer">
+        <a href="#">
           Akintek⚡
         </a>{' '}
-        | Built with Next.js
       </div>
     </footer>
   );

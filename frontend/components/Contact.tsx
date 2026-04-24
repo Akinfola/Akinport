@@ -101,13 +101,13 @@ export default function Contact() {
 
             {/* MAP */}
             <div className="w-full rounded-2xl overflow-hidden shadow-md border border-gray-200">
-  <iframe
-    src="https://www.google.com/maps?q=54%20Prophet%20Tola%20Street%20Okerube%20Ikotun%20Lagos&output=embed"
-    className="w-full h-[380px]"
-    loading="lazy"
-    referrerPolicy="no-referrer-when-downgrade"
-  />
-</div>
+              <iframe
+                 src="https://www.google.com/maps?q=54%20Prophet%20Tola%20Street%20Okerube%20Ikotun%20Lagos&output=embed"
+                 className="w-full h-[380px]"
+                 loading="lazy"
+                 referrerPolicy="no-referrer-when-downgrade"
+              />
+            </div>
           </div>
 
           {/* FORM */}

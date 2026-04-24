@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-const TYPED_WORDS = ['Designer', 'Developer', 'Freelancer'];
+const TYPED_WORDS = ['Developer', 'Freelancer'];
 const TYPING_SPEED = 120;
 const DELETING_SPEED = 60;
 const PAUSE_DURATION = 1800;
