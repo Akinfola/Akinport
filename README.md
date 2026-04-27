@@ -87,7 +87,7 @@ cp .env.example .env
 Edit `.env`:
 ```env
 PORT=5000
-FRONTEND_URL=http://localhost:3000
+FRONTEND_URL=http://**************
 
 # Gmail example (use an App Password, not your real password)
 SMTP_HOST=smtp.gmail.com
