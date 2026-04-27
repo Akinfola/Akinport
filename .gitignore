@@ -8,6 +8,7 @@ node_modules/
 
 # optional example file (this one CAN be pushed if it has no secrets)
 .env.local.example
+.env.example
 
 # build files
 .next/
