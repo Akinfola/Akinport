@@ -8,7 +8,7 @@ export const contactRouter = Router();
 // ─── Rate Limiter ─────────────────────────────────────────────
 const contactLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 5,
+  max: 10,
   standardHeaders: true,
   legacyHeaders: false,
   message: {
@@ -40,7 +40,7 @@ const validateContact = [
     .notEmpty()
     .withMessage("Subject is required")
     .isLength({ min: 2, max: 200 })
-    .withMessage("Subject must be at least 3 characters long."),
+    .withMessage("Subject must be at least 2 characters long."),
 
   body("message")
     .trim()
