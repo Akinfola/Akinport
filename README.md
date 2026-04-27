@@ -108,7 +108,7 @@ cp .env.local.example .env.local
 ```
 
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:5000
+NEXT_PUBLIC_API_URL=http://****************
 ```
 
 ### 3. Run in development
@@ -119,12 +119,12 @@ Open **two terminals**:
 # Terminal 1 — Backend
 cd backend
 npm run dev
-# → http://localhost:5000
+# → http://****************
 
 # Terminal 2 — Frontend
 cd frontend
 npm run dev
-# → http://localhost:3000
+# → http://****************
 ```
 
 ### 4. Build for production
@@ -211,123 +211,3 @@ data arrays to make the portfolio your own.
 - helmet + cors
 
 
-{/* Contact Form */}
-          <div className="lg:col-span-2">
-            <form onSubmit={handleSubmit} className="contact-form" noValidate>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                <div>
-                  <input
-                    type="text"
-                    name="name"
-                    placeholder="Your Name"
-                    value={form.name}
-                    onChange={handleChange}
-                    required
-                    aria-label="Your name"
-                  />
-                </div>
-                <div>
-                  <input
-                    type="email"
-                    name="email"
-                    placeholder="Your Email"
-                    value={form.email}
-                    onChange={handleChange}
-                    required
-                    aria-label="Your email"
-                  />
-                </div>
-              </div>
-
-              <div className="mb-4">
-                <input
-                  type="text"
-                  name="subject"
-                  placeholder="Subject"
-                  value={form.subject}
-                  onChange={handleChange}
-                  required
-                  aria-label="Subject"
-                />
-              </div>
-
-              <div className="mb-4">
-                <textarea
-                  name="message"
-                  placeholder="Message"
-                  value={form.message}
-                  onChange={handleChange}
-                  required
-                  aria-label="Your message"
-                />
-              </div>
-
-              {/* Status messages */}
-              {status === 'loading' && (
-                <div
-                  style={{
-                    textAlign: 'center',
-                    padding: '12px',
-                    color: '#149ddd',
-                    fontSize: 14,
-                    marginBottom: 12,
-                  }}
-                >
-                  <i className="bi bi-arrow-repeat" style={{ marginRight: 6 }} />
-                  Sending your message...
-                </div>
-              )}
-
-              {status === 'success' && (
-                <div
-                  style={{
-                    textAlign: 'center',
-                    padding: '12px',
-                    color: '#47b2e4',
-                    background: '#e8f6fd',
-                    borderRadius: 4,
-                    fontSize: 14,
-                    marginBottom: 12,
-                    border: '1px solid #47b2e4',
-                  }}
-                >
-                  <i className="bi bi-check-circle" style={{ marginRight: 6 }} />
-                  Your message has been sent. Thank you!
-                </div>
-              )}
-
-              {status === 'error' && (
-                <div
-                  style={{
-                    textAlign: 'center',
-                    padding: '12px',
-                    color: '#e53935',
-                    background: '#fdecea',
-                    borderRadius: 4,
-                    fontSize: 14,
-                    marginBottom: 12,
-                    border: '1px solid #e53935',
-                  }}
-                >
-                  <i className="bi bi-exclamation-triangle" style={{ marginRight: 6 }} />
-                  {errorMessage}
-                </div>
-              )}
-
-              <div style={{ textAlign: 'center' }}>
-                <button
-                  type="submit"
-                  className="btn-primary-custom"
-                  disabled={status === 'loading'}
-                  style={{ opacity: status === 'loading' ? 0.7 : 1 }}
-                >
-                  {status === 'loading' ? 'Sending...' : 'Send Message'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
