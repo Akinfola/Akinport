@@ -6,19 +6,52 @@ import { useState } from 'react';
 const BASE = 'https://themewagon.github.io/iPortfolio/assets/img/portfolio';
 
 const items = [
-  { id: 1, category: 'app', title: 'App 1', description: 'Lorem ipsum, dolor sit amet consectetur', image: `${BASE}/app-1.jpg` },
-  { id: 2, category: 'product', title: 'Product 1', description: 'Lorem ipsum, dolor sit amet consectetur', image: `${BASE}/product-1.jpg` },
-  { id: 3, category: 'branding', title: 'Branding 1', description: 'Lorem ipsum, dolor sit amet consectetur', image: `${BASE}/branding-1.jpg` },
-  { id: 4, category: 'books', title: 'Books 1', description: 'Lorem ipsum, dolor sit amet consectetur', image: `${BASE}/books-1.jpg` },
-  { id: 5, category: 'app', title: 'App 2', description: 'Lorem ipsum, dolor sit amet consectetur', image: `${BASE}/app-2.jpg` },
-  { id: 6, category: 'product', title: 'Product 2', description: 'Lorem ipsum, dolor sit amet consectetur', image: `${BASE}/product-2.jpg` },
-  { id: 7, category: 'branding', title: 'Branding 2', description: 'Lorem ipsum, dolor sit amet consectetur', image: `${BASE}/branding-2.jpg` },
-  { id: 8, category: 'books', title: 'Books 2', description: 'Lorem ipsum, dolor sit amet consectetur', image: `${BASE}/books-2.jpg` },
-  { id: 9, category: 'app', title: 'App 3', description: 'Lorem ipsum, dolor sit amet consectetur', image: `${BASE}/app-3.jpg` },
-  { id: 10, category: 'product', title: 'Product 3', description: 'Lorem ipsum, dolor sit amet consectetur', image: `${BASE}/product-3.jpg` },
-  { id: 11, category: 'branding', title: 'Branding 3', description: 'Lorem ipsum, dolor sit amet consectetur', image: `${BASE}/branding-3.jpg` },
-  { id: 12, category: 'books', title: 'Books 3', description: 'Lorem ipsum, dolor sit amet consectetur', image: `${BASE}/books-3.jpg` },
-];
+  {
+    id: 1,
+    title: "QR Code Generator",
+    description: "A web application that generates QR codes for text, URLs, phone numbers, and more.",
+    image: "/assets/QR-code.png",
+    previewLink: "https://my-qrcode1.netlify.app/",
+    liveLink: "https://my-qrcode1.netlify.app/"
+  },
+  {
+    id: 2, category: 'product', title: 'Product 1',
+    description: 'Lorem ipsum, dolor sit amet consectetur',
+    image: `${BASE}/product-1.jpg`
+  },
+  {
+    id: 3, category: 'branding', title: 'Branding 1',
+    description: 'Lorem ipsum, dolor sit amet consectetur',
+    image: `${BASE}/branding-1.jpg`
+  },]
+//   { id: 4, category: 'books', title: 'Books 1', 
+//     description: 'Lorem ipsum, dolor sit amet consectetur', 
+//     image: `${BASE}/books-1.jpg` },
+//   { id: 5, category: 'app', title: 'App 2', 
+//     description: 'Lorem ipsum, dolor sit amet consectetur', 
+//     image: `${BASE}/app-2.jpg` },
+//   { id: 6, category: 'product', title: 'Product 2', 
+//     description: 'Lorem ipsum, dolor sit amet consectetur', 
+//     image: `${BASE}/product-2.jpg` },
+//   { id: 7, category: 'branding', title: 'Branding 2', 
+//     description: 'Lorem ipsum, dolor sit amet consectetur', 
+//     image: `${BASE}/branding-2.jpg` },
+//   { id: 8, category: 'books', title: 'Books 2', 
+//     description: 'Lorem ipsum, dolor sit amet consectetur', 
+//     image: `${BASE}/books-2.jpg` },
+//   { id: 9, category: 'app', title: 'App 3', 
+//     description: 'Lorem ipsum, dolor sit amet consectetur', 
+//     image: `${BASE}/app-3.jpg` },
+//   { id: 10, category: 'product', title: 'Product 3', 
+//     description: 'Lorem ipsum, dolor sit amet consectetur', 
+//     image: `${BASE}/product-3.jpg` },
+//   { id: 11, category: 'branding', title: 'Branding 3', 
+//     description: 'Lorem ipsum, dolor sit amet consectetur', 
+//     image: `${BASE}/branding-3.jpg` },
+//   { id: 12, category: 'books', title: 'Books 3', 
+//     description: 'Lorem ipsum, dolor sit amet consectetur', 
+//     image: `${BASE}/books-3.jpg` },
+// ];
 
 const filters = ['all', 'app', 'product', 'branding', 'books'];
 
@@ -75,18 +108,26 @@ export default function Portfolio() {
                   unoptimized
                 />
                 <div className="portfolio-info">
-                  <h4>{item.title}</h4>
-                  <p>{item.description}</p>
-                  <div className="flex gap-2 mt-2">
-                    <span style={{ fontSize: 12, color: '#149ddd', cursor: 'pointer' }}>
-                      <i className="bi bi-zoom-in mr-1" />
+                  <div className="flex gap-3 mt-4">
+                    <a
+                      href={item.previewLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-3 py-2 bg-gray-200 rounded-md text-sm hover:bg-gray-300"
+                    >
                       Preview
-                    </span>
-                    <span style={{ fontSize: 12, color: '#149ddd', cursor: 'pointer', marginLeft: 8 }}>
-                      <i className="bi bi-link-45deg mr-1" />
-                      Details
-                    </span>
+                    </a>
+
+                    <a
+                      href={item.liveLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-3 py-2 bg-sky-500 text-white rounded-md text-sm hover:bg-sky-600"
+                    >
+                      View Live
+                    </a>
                   </div>
+
                 </div>
               </div>
             </div>
