@@ -12,10 +12,12 @@ const stats = [
 ];
 
 const skills = [
+  // Frontend & Core
   { name: 'Next.js', value: 95 },
-  { name: 'TypeScript', value: 90 },
-  { name: 'Node.js', value: 88 },
   { name: 'React', value: 92 },
+  { name: 'TypeScript', value: 90 },
+  // Backend & Tools
+  { name: 'Node.js', value: 88 },
   { name: 'PostgreSQL / MongoDB', value: 85 },
   { name: 'Git & Deployment', value: 80 },
 ];
@@ -166,21 +168,20 @@ export default function About() {
         </div>
 
         {/* SKILLS */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-
-          <div>
-            <h3 className="text-xl font-bold text-[#173b6c] mb-6">Technical Skills</h3>
-            {skills.slice(0, 3).map((s) => (
-              <SkillBar key={s.name} {...s} active={inView} />
-            ))}
+        <div className="mb-12">
+          <h3 className="text-xl font-bold text-[#173b6c] mb-6">Technical Skills</h3>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-10">
+            <div>
+              {skills.slice(0, 3).map((s) => (
+                <SkillBar key={s.name} {...s} active={inView} />
+              ))}
+            </div>
+            <div>
+              {skills.slice(3).map((s) => (
+                <SkillBar key={s.name} {...s} active={inView} />
+              ))}
+            </div>
           </div>
-
-          <div className="lg:mt-10">
-            {skills.slice(3).map((s) => (
-              <SkillBar key={s.name} {...s} active={inView} />
-            ))}
-          </div>
-
         </div>
       </div>
     </section>

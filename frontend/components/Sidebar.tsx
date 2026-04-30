@@ -116,6 +116,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           ))}
 
           {/* Dropdown */}
+          {/* 
           <li className={`nav-dropdown ${dropdownOpen ? 'open' : ''}`}>
             <a
               href="#"
@@ -170,6 +171,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
               </ul>
             </div>
           </li>
+          */}
         </ul>
       </nav>
     </aside>

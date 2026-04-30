@@ -9,21 +9,35 @@ const items = [
   {
     id: 1,
     title: "QR Code Generator",
+    category: "app",
     description: "A web application that generates QR codes for text, URLs, phone numbers, and more.",
     image: "/assets/QR-code.png",
     previewLink: "https://my-qrcode1.netlify.app/",
     liveLink: "https://my-qrcode1.netlify.app/"
   },
+
   {
-    id: 2, category: 'product', title: 'Product 1',
-    description: 'Lorem ipsum, dolor sit amet consectetur',
-    image: `${BASE}/product-1.jpg`
+    id: 2,
+    title: "Horizon Banking",
+    category: "app",
+    description: "A digital banking platform that allows users to manage their finances with ease—access accounts, transfer funds, and track spending.",
+    image: "/assets/Horizonbank.png",
+    previewLink: "https://horizon-fullstack.vercel.app/",
+    liveLink: "https://horizon-fullstack.vercel.app/"
   },
+
+
   {
-    id: 3, category: 'branding', title: 'Branding 1',
-    description: 'Lorem ipsum, dolor sit amet consectetur',
-    image: `${BASE}/branding-1.jpg`
-  },]
+    id: 3,
+    title: "Financeflow",
+    category: "product",
+    description: "A smart financial management platform that helps users track expenses, set budgets, and visualize finances with real-time insights and alerts to control their money effortlessly.",
+    image: "/assets/Financeflow.png",
+    previewLink: "https://financeflow-nithub.vercel.app/",
+    liveLink: "https://financeflow-nithub.vercel.app/"
+
+  },
+]
 //   { id: 4, category: 'books', title: 'Books 1', 
 //     description: 'Lorem ipsum, dolor sit amet consectetur', 
 //     image: `${BASE}/books-1.jpg` },
@@ -53,7 +67,7 @@ const items = [
 //     image: `${BASE}/books-3.jpg` },
 // ];
 
-const filters = ['all', 'app', 'product', 'branding', 'books'];
+const filters = ['all', 'app', 'product'];
 
 interface LightboxItem {
   image: string;
@@ -73,8 +87,7 @@ export default function Portfolio() {
         <div className="section-title">
           <h2>Portfolio</h2>
           <p>
-            Magnam dolores commodi suscipit. Necessitatibus eius consequatur ex aliquid fuga eum quidem.
-            Sit sint consectetur velit. Quisquam quos quisquam cupiditate.
+            Explore a selection of my recent projects, ranging from robust digital banking platforms to intuitive utility tools. I focus on building scalable, user-centric applications that solve real-world problems and deliver exceptional experiences.
           </p>
         </div>
 
@@ -108,20 +121,24 @@ export default function Portfolio() {
                   unoptimized
                 />
                 <div className="portfolio-info">
+                  <h4>{item.title}</h4>
+                  <p>{item.description}</p>
                   <div className="flex gap-3 mt-4">
-                    <a
-                      href={item.previewLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-3 py-2 bg-gray-200 rounded-md text-sm hover:bg-gray-300"
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setLightbox({ image: item.image, title: item.title, description: item.description });
+                      }}
+                      className="px-3 py-2 bg-gray-200 rounded-md text-sm hover:bg-gray-300 text-black"
                     >
                       Preview
-                    </a>
+                    </button>
 
                     <a
                       href={item.liveLink}
                       target="_blank"
                       rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
                       className="px-3 py-2 bg-sky-500 text-white rounded-md text-sm hover:bg-sky-600"
                     >
                       View Live
@@ -146,7 +163,7 @@ export default function Portfolio() {
           <div
             className="relative"
             onClick={(e) => e.stopPropagation()}
-            style={{ maxWidth: '90vw', textAlign: 'center' }}
+            style={{ maxWidth: '75vw', textAlign: 'center' }}
           >
             <button
               onClick={() => setLightbox(null)}
@@ -167,7 +184,7 @@ export default function Portfolio() {
             <img
               src={lightbox.image}
               alt={lightbox.title}
-              style={{ maxWidth: '85vw', maxHeight: '80vh', objectFit: 'contain', borderRadius: 8 }}
+              style={{ maxWidth: '70vw', maxHeight: '65vh', objectFit: 'contain', borderRadius: 8 }}
             />
             <div style={{ color: '#fff', marginTop: 12 }}>
               <h4 style={{ fontSize: 20, fontFamily: 'Poppins, sans-serif', marginBottom: 4 }}>
