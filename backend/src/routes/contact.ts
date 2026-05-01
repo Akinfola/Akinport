@@ -139,12 +139,13 @@ contactRouter.post(
         message: "Message sent successfully",
       });
 
-    } catch (error) {
+    } catch (error: any) {
       console.error("Email error:", error);
 
       return res.status(500).json({
         success: false,
-        message: "Failed to send message",
+        message: "Email error: " + (error.message || "Unknown error"),
+        code: error.code,
       });
     }
   }
