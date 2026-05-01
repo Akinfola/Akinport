@@ -12,8 +12,7 @@ type FormState = {
 
 type Status = 'idle' | 'loading' | 'success' | 'error';
 
-// ⚠️ MUST be set in Netlify env
-const API_URL = process.env.NEXT_PUBLIC_API_URL!;
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://akinport.onrender.com';
 
 export default function Contact() {
   const [form, setForm] = useState<FormState>({
@@ -33,8 +32,8 @@ export default function Contact() {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: FormEvent | React.MouseEvent) => {
+    e?.preventDefault();
 
     setStatus('loading');
     setErrorMessage('');
@@ -50,7 +49,6 @@ export default function Contact() {
 
       const data = await res.json();
 
-      // ✅ IMPORTANT: handle HTTP errors properly
       if (!res.ok) {
         throw new Error(data.message || 'Request failed');
       }
@@ -58,13 +56,7 @@ export default function Contact() {
       if (data.success) {
         setStatus('success');
         setShowModal(true);
-
-        setForm({
-          name: '',
-          email: '',
-          subject: '',
-          message: '',
-        });
+        setForm({ name: '', email: '', subject: '', message: '' });
       } else {
         setStatus('error');
         setErrorMessage(data.message || 'Something went wrong');
@@ -176,9 +168,10 @@ export default function Contact() {
                 </p>
               )}
 
-              {/* BUTTON */}
+              {/* ✅ FIXED: type="button" + onClick to bypass native form GET */}
               <button
-                type="submit"
+                type="button"
+                onClick={handleSubmit}
                 disabled={status === 'loading'}
                 className="
                   w-full py-3 rounded-xl font-semibold text-white
