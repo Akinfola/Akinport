@@ -1,7 +1,8 @@
-import { Router, Request, Response } from "express";
+import { Router, Request, Response, RequestHandler } from "express";
 import { body, validationResult } from "express-validator";
-import rateLimit from "express-rate-limit";
+import { rateLimit } from "express-rate-limit";
 import nodemailer from "nodemailer";
+import SMTPTransport from "nodemailer/lib/smtp-transport";
 
 export const contactRouter = Router();
 
@@ -48,23 +49,34 @@ const validateContact = [
     .withMessage("Message must be at least 2 characters long"),
 ];
 
+interface ContactRequestBody {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+}
+
 // ─── SMTP TRANSPORTER ────────────────────────────────────────
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST || "smtp.gmail.com",
-  port: Number(process.env.SMTP_PORT) || 587,
-  secure: false,
+  port: 465,
+  secure: true,
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
   },
-});
+  // Force IPv4 to fix the ENETUNREACH error
+  // @ts-ignore - 'family' exists at runtime but not in all type versions
+  family: 4,
+} as SMTPTransport.Options);
 
 // ─── ROUTE ───────────────────────────────────────────────────
 contactRouter.post(
   "/",
-  contactLimiter,
-  validateContact,
-  async (req: Request, res: Response) => {
+  contactLimiter as RequestHandler,
+  validateContact as any,
+  async (req: Request<{}, {}, ContactRequestBody>, res: Response) => {
+    const startTime = Date.now();
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
@@ -77,71 +89,87 @@ contactRouter.post(
 
     const { name, email, subject, message } = req.body;
 
-    // safe email fallback
-    const ownerEmail =
-      process.env.CONTACT_EMAIL ?? process.env.SMTP_USER;
+    // Helper to escape HTML and prevent injection in emails
+    const escapeHTML = (str: string) =>
+      str.replace(/[&<>"']/g, (m) => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      }[m] || m));
+
+    const safeName = escapeHTML(name);
+    const safeSubject = escapeHTML(subject);
+    const safeMessage = escapeHTML(message).replace(/\n/g, "<br/>");
+
+    // Fix: Use || to catch empty strings, not just null/undefined
+    const ownerEmail = process.env.CONTACT_EMAIL || process.env.SMTP_USER;
 
     if (!ownerEmail) {
-      console.error("No owner email configured");
+      console.error("❌ Email configuration error: CONTACT_EMAIL/SMTP_USER missing");
       return res.status(500).json({
         success: false,
-        message: "Email configuration error",
+        message: "Server configuration error",
       });
     }
 
-    const smtpReady =
-      process.env.SMTP_USER &&
-      process.env.SMTP_PASS;
+    const smtpReady = process.env.SMTP_USER && process.env.SMTP_PASS;
 
-    // ─── DEV MODE (no SMTP) ────────────────────────────────
+    // ─── DEV MODE ───────────────────────────────────────────
     if (!smtpReady) {
-      console.log("[DEV MODE] Contact form:", req.body);
-
+      console.log("🛠️ [DEV MODE] Contact Submission:", { name, email, subject });
       return res.status(200).json({
         success: true,
-        message: "Message received successfully",
+        message: "Message received (Dev Mode - no email sent)",
       });
     }
 
     try {
       await Promise.all([
-        // ─── EMAIL TO OWNER ────────────────────────────────
+        // ─── 1. NOTIFICATION TO OWNER ────────────────────────
         transporter.sendMail({
-          from: `"Portfolio" <${process.env.SMTP_USER}>`,
+          from: `"Portfolio Contact" <${process.env.SMTP_USER}>`,
           to: ownerEmail,
           replyTo: email,
-          subject: `[Contact] ${subject}`,
+          subject: `⚡ New Message: ${safeSubject}`,
           html: `
-            <h2>New Message</h2>
-            <p><b>Name:</b> ${name}</p>
-            <p><b>Email:</b> ${email}</p>
-            <p><b>Subject:</b> ${subject}</p>
-            <p><b>Message:</b><br/>${message}</p>
+            <div style="font-family:sans-serif; max-width:600px; border:1px solid #e2e8f0; border-radius:12px; padding:24px; color:#1e293b;">
+              <h2 style="color:#0ea5e9; margin-top:0;">New Portfolio Message</h2>
+              <hr style="border:0; border-top:1px solid #e2e8f0; margin:20px 0;"/>
+              <p><strong>From:</strong> ${safeName} (${email})</p>
+              <p><strong>Subject:</strong> ${safeSubject}</p>
+              <div style="background:#f8fafc; padding:16px; border-radius:8px; margin-top:16px; white-space:pre-wrap;">
+                ${safeMessage}
+              </div>
+              <p style="font-size:12px; color:#94a3b8; margin-top:24px;">Sent from your Portfolio Contact Form</p>
+            </div>
           `,
         }),
 
-        // ─── AUTO REPLY ────────────────────────────────────
+        // ─── 2. AUTO-REPLY TO SENDER ─────────────────────────
         transporter.sendMail({
           from: `"Akintek" <${process.env.SMTP_USER}>`,
           to: email,
-          subject: `Re: ${subject}`,
+          subject: `Thanks for reaching out!`,
           html: `
-            <p>Hi ${name},</p>
-            <p>Thanks for contacting me. I’ll get back to you soon.</p>
-            <br/>
-            <p>— Akintek</p>
+            <div style="font-family:sans-serif; max-width:600px; border:1px solid #e2e8f0; border-radius:12px; padding:24px; color:#1e293b;">
+              <p>Hi ${safeName},</p>
+              <p>Thanks for contacting me! I've received your message regarding <strong>"${safeSubject}"</strong> and I'll get back to you as soon as possible.</p>
+              <p>In the meantime, feel free to check out more of my work on my portfolio.</p>
+              <br/>
+              <p>Best regards,<br/><strong>Akintek David</strong></p>
+            </div>
           `,
         }),
       ]);
 
+      const duration = Date.now() - startTime;
+      console.info(`✅ Message processed in ${duration}ms`);
+
       return res.status(200).json({
         success: true,
-        message: "Message sent successfully",
+        message: "Message sent successfully!",
       });
 
     } catch (error: any) {
-      console.error("Email error:", error);
-
+      console.error("❌ SMTP Error:", error.message);
       return res.status(500).json({
         success: false,
         message: "Email error: " + (error.message || "Unknown error"),
