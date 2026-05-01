@@ -121,57 +121,60 @@ contactRouter.post(
       });
     }
 
-    // ─── SEND EMAILS (Background) ───────────────────────────
-    // We don't 'await' this so the user gets an instant response.
-    Promise.all([
-      // 1. NOTIFICATION TO OWNER
-      transporter.sendMail({
-        from: `"Portfolio Contact" <${process.env.SMTP_USER}>`,
-        to: ownerEmail,
-        replyTo: email,
-        subject: `⚡ New Message: ${safeSubject}`,
-        html: `
-          <div style="font-family:sans-serif; max-width:600px; border:1px solid #e2e8f0; border-radius:12px; padding:24px; color:#1e293b;">
-            <h2 style="color:#0ea5e9; margin-top:0;">New Portfolio Message</h2>
-            <hr style="border:0; border-top:1px solid #e2e8f0; margin:20px 0;"/>
-            <p><strong>From:</strong> ${safeName} (${email})</p>
-            <p><strong>Subject:</strong> ${safeSubject}</p>
-            <div style="background:#f8fafc; padding:16px; border-radius:8px; margin-top:16px; white-space:pre-wrap;">
-              ${safeMessage}
+    try {
+      await Promise.all([
+        // 1. NOTIFICATION TO OWNER
+        transporter.sendMail({
+          from: `"Portfolio Contact" <${process.env.SMTP_USER}>`,
+          to: ownerEmail,
+          replyTo: email,
+          subject: `⚡ New Message: ${safeSubject}`,
+          html: `
+            <div style="font-family:sans-serif; max-width:600px; border:1px solid #e2e8f0; border-radius:12px; padding:24px; color:#1e293b;">
+              <h2 style="color:#0ea5e9; margin-top:0;">New Portfolio Message</h2>
+              <hr style="border:0; border-top:1px solid #e2e8f0; margin:20px 0;"/>
+              <p><strong>From:</strong> ${safeName} (${email})</p>
+              <p><strong>Subject:</strong> ${safeSubject}</p>
+              <div style="background:#f8fafc; padding:16px; border-radius:8px; margin-top:16px; white-space:pre-wrap;">
+                ${safeMessage}
+              </div>
+              <p style="font-size:12px; color:#94a3b8; margin-top:24px;">Sent from your Portfolio Contact Form</p>
             </div>
-            <p style="font-size:12px; color:#94a3b8; margin-top:24px;">Sent from your Portfolio Contact Form</p>
-          </div>
-        `,
-      }),
+          `,
+        }),
 
-      // 2. AUTO-REPLY TO SENDER
-      transporter.sendMail({
-        from: `"Akintek" <${process.env.SMTP_USER}>`,
-        to: email,
-        subject: `Thanks for reaching out!`,
-        html: `
-          <div style="font-family:sans-serif; max-width:600px; border:1px solid #e2e8f0; border-radius:12px; padding:24px; color:#1e293b;">
-            <p>Hi ${safeName},</p>
-            <p>Thanks for contacting me! I've received your message regarding <strong>"${safeSubject}"</strong> and I'll get back to you as soon as possible.</p>
-            <p>In the meantime, feel free to check out more of my work on my portfolio.</p>
-            <br/>
-            <p>Best regards,<br/><strong>Akintek David</strong></p>
-          </div>
-        `,
-      }),
-    ])
-      .then(() => {
-        const duration = Date.now() - startTime;
-        console.info(`✅ Background emails sent in ${duration}ms`);
-      })
-      .catch((err) => {
-        console.error("❌ Background SMTP Error:", err.message);
+        // 2. AUTO-REPLY TO SENDER
+        transporter.sendMail({
+          from: `"Akintek" <${process.env.SMTP_USER}>`,
+          to: email,
+          subject: `Thanks for reaching out!`,
+          html: `
+            <div style="font-family:sans-serif; max-width:600px; border:1px solid #e2e8f0; border-radius:12px; padding:24px; color:#1e293b;">
+              <p>Hi ${safeName},</p>
+              <p>Thanks for contacting me! I've received your message regarding <strong>"${safeSubject}"</strong> and I'll get back to you as soon as possible.</p>
+              <p>In the meantime, feel free to check out more of my work on my portfolio.</p>
+              <br/>
+              <p>Best regards,<br/><strong>Akintek David</strong></p>
+            </div>
+          `,
+        }),
+      ]);
+
+      const duration = Date.now() - startTime;
+      console.info(`✅ Message processed in ${duration}ms`);
+
+      return res.status(200).json({
+        success: true,
+        message: "Message sent successfully!",
       });
 
-    // ─── INSTANT RESPONSE ──────────────────────────────────
-    return res.status(200).json({
-      success: true,
-      message: "Message sent successfully!",
-    });
+    } catch (error: any) {
+      console.error("❌ SMTP Error:", error.message);
+      return res.status(500).json({
+        success: false,
+        message: "Email error: " + (error.message || "Unknown error"),
+        code: error.code,
+      });
+    }
   }
 );
