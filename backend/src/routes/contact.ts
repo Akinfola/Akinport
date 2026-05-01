@@ -51,17 +51,15 @@ const validateContact = [
 ];
 
 // ─── Transporter ──────────────────────────────────────────────
-function createTransporter() {
-  return nodemailer.createTransport({
-    host: process.env.SMTP_HOST || "smtp.gmail.com",
-    port: Number(process.env.SMTP_PORT) || 587,
-    secure: false,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-  });
-}
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST || "smtp.gmail.com",
+  port: Number(process.env.SMTP_PORT) || 587,
+  secure: false,
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
+});
 
 // ─── Route ────────────────────────────────────────────────────
 contactRouter.post(
@@ -100,44 +98,48 @@ contactRouter.post(
     }
 
     try {
-      const transporter = createTransporter();
-      await transporter.verify();
-
+      const startTime = Date.now();
       const ownerEmail = process.env.CONTACT_EMAIL || process.env.SMTP_USER;
 
-      // ─── Notify owner ─────────────────────────────────────
-      await transporter.sendMail({
-        from: `"Portfolio Contact" <${process.env.SMTP_USER}>`,
-        to: ownerEmail,
-        replyTo: email,
-        subject: `[Portfolio] ${subject}`,
-        html: `
-          <div style="font-family:sans-serif;max-width:600px;margin:auto">
-            <h2 style="color:#0ea5e9">New Portfolio Message</h2>
-            <table style="width:100%;border-collapse:collapse">
-              <tr><td style="padding:8px;font-weight:bold;width:90px">Name</td><td style="padding:8px">${name}</td></tr>
-              <tr style="background:#f9f9f9"><td style="padding:8px;font-weight:bold">Email</td><td style="padding:8px"><a href="mailto:${email}">${email}</a></td></tr>
-              <tr><td style="padding:8px;font-weight:bold">Subject</td><td style="padding:8px">${subject}</td></tr>
-              <tr style="background:#f9f9f9"><td style="padding:8px;font-weight:bold;vertical-align:top">Message</td><td style="padding:8px;white-space:pre-wrap">${message}</td></tr>
-            </table>
-          </div>
-        `,
-      });
+      // ─── Send Emails in Parallel ──────────────────────────
+      await Promise.all([
+        // 1. Notify owner
+        transporter.sendMail({
+          from: `"Portfolio Contact" <${process.env.SMTP_USER}>`,
+          to: ownerEmail,
+          replyTo: email,
+          subject: `[Portfolio] ${subject}`,
+          html: `
+            <div style="font-family:sans-serif;max-width:600px;margin:auto">
+              <h2 style="color:#0ea5e9">New Portfolio Message</h2>
+              <table style="width:100%;border-collapse:collapse">
+                <tr><td style="padding:8px;font-weight:bold;width:90px">Name</td><td style="padding:8px">${name}</td></tr>
+                <tr style="background:#f9f9f9"><td style="padding:8px;font-weight:bold">Email</td><td style="padding:8px"><a href="mailto:${email}">${email}</a></td></tr>
+                <tr><td style="padding:8px;font-weight:bold">Subject</td><td style="padding:8px">${subject}</td></tr>
+                <tr style="background:#f9f9f9"><td style="padding:8px;font-weight:bold;vertical-align:top">Message</td><td style="padding:8px;white-space:pre-wrap">${message}</td></tr>
+              </table>
+            </div>
+          `,
+        }),
 
-      // ─── Auto-reply to sender ──────────────────────────────
-      await transporter.sendMail({
-        from: `"AKINTEK⚡" <${process.env.SMTP_USER}>`,
-        to: email,
-        subject: `Re: ${subject}`,
-        html: `
-          <div style="font-family:sans-serif;max-width:600px;margin:auto">
-            <p>Hi ${name},</p>
-            <p>Thanks for reaching out! I've received your message and will reply as soon as possible.</p>
-            <br/>
-            <p>Best regards,<br/><strong>Akintek</strong></p>
-          </div>
-        `,
-      });
+        // 2. Auto-reply to sender
+        transporter.sendMail({
+          from: `"AKINTEK⚡" <${process.env.SMTP_USER}>`,
+          to: email,
+          subject: `Re: ${subject}`,
+          html: `
+            <div style="font-family:sans-serif;max-width:600px;margin:auto">
+              <p>Hi ${name},</p>
+              <p>Thanks for reaching out! I've received your message and will reply as soon as possible.</p>
+              <br/>
+              <p>Best regards,<br/><strong>Akintek</strong></p>
+            </div>
+          `,
+        }),
+      ]);
+
+      const duration = Date.now() - startTime;
+      console.info(`[contact] Message sent in ${duration}ms`);
 
       res.status(200).json({
         success: true,
