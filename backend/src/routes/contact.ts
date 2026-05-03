@@ -59,14 +59,14 @@ interface ContactRequestBody {
 // ─── SMTP TRANSPORTER ────────────────────────────────────────
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST || "smtp.gmail.com",
-  port: 465,
-  secure: true,
+  port: parseInt(process.env.SMTP_PORT || "465"),
+  secure: process.env.SMTP_SECURE === "true" || process.env.SMTP_PORT === "465",
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
   },
-  // Force IPv4 to fix the ENETUNREACH error
-  // @ts-ignore - 'family' exists at runtime but not in all type versions
+  // Force IPv4 to fix potential ENETUNREACH errors on some hosts
+  // @ts-ignore
   family: 4,
 } as SMTPTransport.Options);
 
