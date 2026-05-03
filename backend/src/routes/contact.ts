@@ -41,7 +41,7 @@ const validateContact = [
   body("message")
     .trim()
     .notEmpty().withMessage("Message is required")
-    .isLength({ min: 10, max: 5000 }).withMessage("Message must be between 10 and 5000 characters"),
+    .isLength({ min: 2, max: 5000 }).withMessage("Message must be between 2 and 5000 characters"),
 ];
 
 // ─── TYPES ────────────────────────────────────────────────────
