@@ -3,6 +3,8 @@ import { body, validationResult } from "express-validator";
 import { rateLimit } from "express-rate-limit";
 import nodemailer from "nodemailer";
 import SMTPTransport from "nodemailer/lib/smtp-transport";
+import dns from "node:dns";
+
 
 export const contactRouter = Router();
 
@@ -58,18 +60,19 @@ interface ContactRequestBody {
 
 // ─── SMTP TRANSPORTER ────────────────────────────────────────
 const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com", // Using direct hostname for better stability
-  port: 465, // Forcing 465 as it's the most reliable on Render
+  host: "smtp.gmail.com",
+  port: 465,
   secure: true,
+  // ☢️ THE NUCLEAR OPTION: Force DNS to IPv4 manually
+  lookup: (hostname: string, options: any, callback: any) => {
+    dns.lookup(hostname, { family: 4 }, callback);
+  },
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
   },
-  // Hard-forcing IPv4 to stop the ENETUNREACH IPv6 errors
-  // @ts-ignore
-  family: 4,
-  connectionTimeout: 10000, // 10 seconds timeout
-  greetingTimeout: 10000,
+  connectionTimeout: 20000, // Increased to 20s
+  greetingTimeout: 20000,
 } as SMTPTransport.Options);
 
 // ─── ROUTE ───────────────────────────────────────────────────
