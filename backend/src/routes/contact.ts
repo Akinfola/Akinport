@@ -156,7 +156,7 @@ contactRouter.post(
             <p>Best regards,<br/><strong>Akintek David</strong></p>
           </div>
         `,
-      }).catch(err => console.error("⚠️ Auto-reply failed:", err.message));
+      }).catch((err: any) => console.error("⚠️ Auto-reply failed:", err.message));
 
       const duration = Date.now() - startTime;
       console.info(`✅ Message processed in ${duration}ms`);

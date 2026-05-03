@@ -17,7 +17,7 @@ const PORT = process.env.PORT || 5000;
 // ─── FIXED CORS (production safe) ─────────────────────────────
 app.use(
   cors({
-    origin: function (origin, callback) {
+    origin: function (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
       const allowedOrigins = [
         "https://akintek.netlify.app",
         "http://localhost:3000",
@@ -45,7 +45,7 @@ app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true, limit: "10kb" }));
 
 // ─── Debug Logger (REMOVE LATER IF YOU WANT) ────────────────
-app.use((req, _res, next) => {
+app.use((req: express.Request, _res: express.Response, next: express.NextFunction) => {
   console.log("➡️", req.method, req.url);
   next();
 });
