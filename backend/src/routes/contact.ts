@@ -1,89 +1,119 @@
 import { Router, Request, Response, RequestHandler } from "express";
 import { body, validationResult } from "express-validator";
 import { rateLimit } from "express-rate-limit";
-import nodemailer from "nodemailer";
-import SMTPTransport from "nodemailer/lib/smtp-transport";
-import dns from "node:dns";
-
+import { Resend } from "resend";
 
 export const contactRouter = Router();
 
-// ─── RATE LIMITER ────────────────────────────────────────────
+// ─── RESEND CLIENT ────────────────────────────────────────────
+const resend = new Resend(process.env.RESEND_API_KEY);
+const OWNER_EMAIL = process.env.CONTACT_EMAIL || "ejideayodele@gmail.com";
+
+// ─── RATE LIMITER ─────────────────────────────────────────────
 const contactLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100, // increased for testing stability
+  max: process.env.NODE_ENV === "production" ? 5 : 100,
   standardHeaders: true,
   legacyHeaders: false,
   message: {
     success: false,
-    message: "Too many requests. Try again later.",
+    message: "Too many requests. Please try again later.",
   },
 });
 
-// ─── VALIDATION ──────────────────────────────────────────────
+// ─── VALIDATION ───────────────────────────────────────────────
 const validateContact = [
   body("name")
     .trim()
-    .notEmpty()
-    .withMessage("Name is required")
-    .isLength({ min: 2, max: 100 })
-    .withMessage("Name must be at least 2 characters long"),
+    .notEmpty().withMessage("Name is required")
+    .isLength({ min: 2, max: 100 }).withMessage("Name must be between 2 and 100 characters"),
 
   body("email")
     .trim()
-    .notEmpty()
-    .withMessage("Email is required")
-    .isEmail()
-    .withMessage("Please enter a valid email address"),
+    .notEmpty().withMessage("Email is required")
+    .isEmail().withMessage("Please enter a valid email address"),
 
   body("subject")
     .trim()
-    .notEmpty()
-    .withMessage("Subject is required")
-    .isLength({ min: 2, max: 200 })
-    .withMessage("Subject must be at least 2 characters long"),
+    .notEmpty().withMessage("Subject is required")
+    .isLength({ min: 2, max: 200 }).withMessage("Subject must be between 2 and 200 characters"),
 
   body("message")
     .trim()
-    .notEmpty()
-    .withMessage("Message is required")
-    .isLength({ min: 2, max: 5000 })
-    .withMessage("Message must be at least 2 characters long"),
+    .notEmpty().withMessage("Message is required")
+    .isLength({ min: 10, max: 5000 }).withMessage("Message must be between 10 and 5000 characters"),
 ];
 
-interface ContactRequestBody {
+// ─── TYPES ────────────────────────────────────────────────────
+interface ContactBody {
   name: string;
   email: string;
   subject: string;
   message: string;
 }
 
-// ─── SMTP TRANSPORTER ────────────────────────────────────────
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 465,
-  secure: true,
-  // ☢️ THE NUCLEAR OPTION: Force DNS to IPv4 manually
-  lookup: (hostname: string, options: any, callback: any) => {
-    dns.lookup(hostname, { family: 4 }, callback);
-  },
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-  connectionTimeout: 20000, // Increased to 20s
-  greetingTimeout: 20000,
-} as SMTPTransport.Options);
+// ─── HELPERS ──────────────────────────────────────────────────
+const escapeHTML = (str: string) =>
+  str.replace(/[&<>"']/g, (m) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m] || m)
+  );
 
-// ─── ROUTE ───────────────────────────────────────────────────
+// ─── EMAIL TEMPLATES ──────────────────────────────────────────
+function ownerEmailHTML(name: string, email: string, subject: string, message: string) {
+  return `
+    <div style="font-family:sans-serif;max-width:600px;margin:auto;border:1px solid #e2e8f0;border-radius:12px;padding:24px;color:#1e293b;">
+      <h2 style="color:#0ea5e9;margin-top:0;">📬 New Portfolio Message</h2>
+      <hr style="border:0;border-top:1px solid #e2e8f0;margin:16px 0;"/>
+      <table style="width:100%;border-collapse:collapse;">
+        <tr>
+          <td style="padding:8px 0;font-weight:bold;width:80px;color:#64748b;">From</td>
+          <td style="padding:8px 0;">${name} &lt;${email}&gt;</td>
+        </tr>
+        <tr style="background:#f8fafc;">
+          <td style="padding:8px;font-weight:bold;color:#64748b;">Subject</td>
+          <td style="padding:8px;">${subject}</td>
+        </tr>
+      </table>
+      <div style="background:#f8fafc;padding:16px;border-radius:8px;margin-top:16px;line-height:1.7;">
+        ${message}
+      </div>
+      <p style="font-size:11px;color:#94a3b8;margin-top:24px;text-align:center;">
+        Sent via your Portfolio Contact Form
+      </p>
+    </div>
+  `;
+}
+
+function autoReplyHTML(name: string, subject: string) {
+  return `
+    <div style="font-family:sans-serif;max-width:600px;margin:auto;border:1px solid #e2e8f0;border-radius:12px;padding:24px;color:#1e293b;">
+      <h2 style="color:#0ea5e9;margin-top:0;">Thanks for reaching out! 👋</h2>
+      <p>Hi <strong>${name}</strong>,</p>
+      <p>
+        I've received your message regarding <strong>"${subject}"</strong>
+        and will get back to you as soon as possible — usually within 24–48 hours.
+      </p>
+      <p>In the meantime, feel free to explore more of my work on my portfolio.</p>
+      <br/>
+      <p style="margin:0;">Best regards,</p>
+      <p style="margin:4px 0 0;font-weight:bold;color:#0ea5e9;">Akintek David</p>
+      <p style="font-size:11px;color:#94a3b8;margin-top:24px;">
+        This is an automated reply. Please do not reply to this email directly.
+      </p>
+    </div>
+  `;
+}
+
+// ─── POST /api/contact ────────────────────────────────────────
 contactRouter.post(
   "/",
   contactLimiter as RequestHandler,
   validateContact as any,
-  async (req: Request<{}, {}, ContactRequestBody>, res: Response) => {
+  async (req: Request<{}, {}, ContactBody>, res: Response) => {
     const startTime = Date.now();
-    const errors = validationResult(req);
 
+    // ── Validation ────────────────────────────────────────────
+    const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(422).json({
         success: false,
@@ -94,92 +124,55 @@ contactRouter.post(
 
     const { name, email, subject, message } = req.body;
 
-    // Helper to escape HTML and prevent injection in emails
-    const escapeHTML = (str: string) =>
-      str.replace(/[&<>"']/g, (m) => ({
-        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
-      }[m] || m));
-
     const safeName = escapeHTML(name);
     const safeSubject = escapeHTML(subject);
     const safeMessage = escapeHTML(message).replace(/\n/g, "<br/>");
 
-    // Fix: Use || to catch empty strings, not just null/undefined
-    const ownerEmail = process.env.CONTACT_EMAIL || process.env.SMTP_USER;
-
-    if (!ownerEmail) {
-      console.error("❌ Email configuration error: CONTACT_EMAIL/SMTP_USER missing");
-      return res.status(500).json({
-        success: false,
-        message: "Server configuration error",
-      });
-    }
-
-    const smtpReady = process.env.SMTP_USER && process.env.SMTP_PASS;
-
-    // ─── DEV MODE ───────────────────────────────────────────
-    if (!smtpReady) {
-      console.log("🛠️ [DEV MODE] Contact Submission:", { name, email, subject });
+    // ── Dev mode ──────────────────────────────────────────────
+    if (!process.env.RESEND_API_KEY) {
+      console.log("🛠️  [DEV MODE] Submission received:", { name, email, subject });
       return res.status(200).json({
         success: true,
-        message: "Message received (Dev Mode - no email sent)",
+        message: "Message received! (Dev mode — no email sent)",
       });
     }
 
-    // ─── BACKGROUND EMAIL PROCESSING ────────────────────────────
-    console.log(`📩 Processing contact from: ${email}`);
-    
-    res.status(200).json({
-      success: true,
-      message: "Message received! We are processing your request.",
-    });
+    // ── Send emails ───────────────────────────────────────────
+    try {
+      console.log(`📩 New message from: ${name} <${email}>`);
 
-    (async () => {
-      try {
-        console.log("⏳ Attempting to send email...");
-        
-        // 1. NOTIFICATION TO OWNER
-        const ownerResult = await transporter.sendMail({
-          from: `"Portfolio Contact" <${process.env.SMTP_USER}>`,
-          to: ownerEmail,
+      await Promise.all([
+        // Notify owner
+        resend.emails.send({
+          from: "Portfolio Contact <onboarding@resend.dev>",
+          to: OWNER_EMAIL,
           replyTo: email,
           subject: `⚡ New Message: ${safeSubject}`,
-          html: `
-            <div style="font-family:sans-serif; max-width:600px; border:1px solid #e2e8f0; border-radius:12px; padding:24px; color:#1e293b;">
-              <h2 style="color:#0ea5e9; margin-top:0;">New Portfolio Message</h2>
-              <hr style="border:0; border-top:1px solid #e2e8f0; margin:20px 0;"/>
-              <p><strong>From:</strong> ${safeName} (${email})</p>
-              <p><strong>Subject:</strong> ${safeSubject}</p>
-              <div style="background:#f8fafc; padding:16px; border-radius:8px; margin-top:16px; white-space:pre-wrap;">
-                ${safeMessage}
-              </div>
-              <p style="font-size:12px; color:#94a3b8; margin-top:24px;">Sent from your Portfolio Contact Form</p>
-            </div>
-          `,
-        });
-        console.log("📨 Owner notification sent:", ownerResult.messageId);
+          html: ownerEmailHTML(safeName, email, safeSubject, safeMessage),
+        }),
 
-        // 2. AUTO-REPLY TO SENDER
-        const replyResult = await transporter.sendMail({
-          from: `"Akintek" <${process.env.SMTP_USER}>`,
+        // Auto-reply to sender
+        resend.emails.send({
+          from: "Akintek David <onboarding@resend.dev>",
           to: email,
-          subject: `Thanks for reaching out!`,
-          html: `
-            <div style="font-family:sans-serif; max-width:600px; border:1px solid #e2e8f0; border-radius:12px; padding:24px; color:#1e293b;">
-              <p>Hi ${safeName},</p>
-              <p>Thanks for contacting me! I've received your message regarding <strong>"${safeSubject}"</strong> and I'll get back to you as soon as possible.</p>
-              <br/>
-              <p>Best regards,<br/><strong>Akintek David</strong></p>
-            </div>
-          `,
-        });
-        console.log("📨 Auto-reply sent:", replyResult.messageId);
+          subject: `Re: ${safeSubject}`,
+          html: autoReplyHTML(safeName, safeSubject),
+        }),
+      ]);
 
-        console.info(`✅ All emails processed in ${Date.now() - startTime}ms`);
+      console.log(`✅ Emails sent in ${Date.now() - startTime}ms`);
 
-      } catch (error: any) {
-        console.error("❌ SMTP Error Detail:", error);
-      }
-    })();
+      return res.status(200).json({
+        success: true,
+        message: "Message sent successfully!",
+      });
+
+    } catch (error: any) {
+      console.error("❌ Resend Error:", error?.message || error);
+      return res.status(500).json({
+        success: false,
+        message: "Failed to send message. Please try again later.",
+      });
+    }
   }
 );
