@@ -12,8 +12,6 @@ type FormState = {
 
 type Status = 'idle' | 'loading' | 'success' | 'error';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://akinport.onrender.com';
-
 export default function Contact() {
   const [form, setForm] = useState<FormState>({
     name: '',
@@ -32,14 +30,14 @@ export default function Contact() {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = async (e?: FormEvent | React.MouseEvent) => {
-    e?.preventDefault();
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
 
     setStatus('loading');
     setErrorMessage('');
 
     try {
-      const res = await fetch(`${API_URL}/api/contact`, {
+      const res = await fetch('/api/contact', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -168,10 +166,8 @@ export default function Contact() {
                 </p>
               )}
 
-              {/* ✅ FIXED: type="button" + onClick to bypass native form GET */}
               <button
-                type="button"
-                onClick={handleSubmit}
+                type="submit"
                 disabled={status === 'loading'}
                 className="
                   w-full py-3 rounded-xl font-semibold text-white

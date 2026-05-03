@@ -8,8 +8,16 @@ const nextConfig = {
       },
     ],
   },
-  env: {
-    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000',
+  async rewrites() {
+    const isDev = process.env.NODE_ENV === 'development';
+    return [
+      {
+        source: '/api/contact',
+        destination: isDev 
+          ? 'http://localhost:5000/api/contact'
+          : 'https://akinport.onrender.com/api/contact',
+      },
+    ];
   },
 };
 

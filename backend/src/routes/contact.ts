@@ -122,43 +122,41 @@ contactRouter.post(
     }
 
     try {
-      await Promise.all([
-        // 1. NOTIFICATION TO OWNER
-        transporter.sendMail({
-          from: `"Portfolio Contact" <${process.env.SMTP_USER}>`,
-          to: ownerEmail,
-          replyTo: email,
-          subject: `⚡ New Message: ${safeSubject}`,
-          html: `
-            <div style="font-family:sans-serif; max-width:600px; border:1px solid #e2e8f0; border-radius:12px; padding:24px; color:#1e293b;">
-              <h2 style="color:#0ea5e9; margin-top:0;">New Portfolio Message</h2>
-              <hr style="border:0; border-top:1px solid #e2e8f0; margin:20px 0;"/>
-              <p><strong>From:</strong> ${safeName} (${email})</p>
-              <p><strong>Subject:</strong> ${safeSubject}</p>
-              <div style="background:#f8fafc; padding:16px; border-radius:8px; margin-top:16px; white-space:pre-wrap;">
-                ${safeMessage}
-              </div>
-              <p style="font-size:12px; color:#94a3b8; margin-top:24px;">Sent from your Portfolio Contact Form</p>
+      // 1. NOTIFICATION TO OWNER (Critical)
+      await transporter.sendMail({
+        from: `"Portfolio Contact" <${process.env.SMTP_USER}>`,
+        to: ownerEmail,
+        replyTo: email,
+        subject: `⚡ New Message: ${safeSubject}`,
+        html: `
+          <div style="font-family:sans-serif; max-width:600px; border:1px solid #e2e8f0; border-radius:12px; padding:24px; color:#1e293b;">
+            <h2 style="color:#0ea5e9; margin-top:0;">New Portfolio Message</h2>
+            <hr style="border:0; border-top:1px solid #e2e8f0; margin:20px 0;"/>
+            <p><strong>From:</strong> ${safeName} (${email})</p>
+            <p><strong>Subject:</strong> ${safeSubject}</p>
+            <div style="background:#f8fafc; padding:16px; border-radius:8px; margin-top:16px; white-space:pre-wrap;">
+              ${safeMessage}
             </div>
-          `,
-        }),
+            <p style="font-size:12px; color:#94a3b8; margin-top:24px;">Sent from your Portfolio Contact Form</p>
+          </div>
+        `,
+      });
 
-        // 2. AUTO-REPLY TO SENDER
-        transporter.sendMail({
-          from: `"Akintek" <${process.env.SMTP_USER}>`,
-          to: email,
-          subject: `Thanks for reaching out!`,
-          html: `
-            <div style="font-family:sans-serif; max-width:600px; border:1px solid #e2e8f0; border-radius:12px; padding:24px; color:#1e293b;">
-              <p>Hi ${safeName},</p>
-              <p>Thanks for contacting me! I've received your message regarding <strong>"${safeSubject}"</strong> and I'll get back to you as soon as possible.</p>
-              <p>In the meantime, feel free to check out more of my work on my portfolio.</p>
-              <br/>
-              <p>Best regards,<br/><strong>Akintek David</strong></p>
-            </div>
-          `,
-        }),
-      ]);
+      // 2. AUTO-REPLY TO SENDER (Non-critical, don't await/fail if it fails)
+      transporter.sendMail({
+        from: `"Akintek" <${process.env.SMTP_USER}>`,
+        to: email,
+        subject: `Thanks for reaching out!`,
+        html: `
+          <div style="font-family:sans-serif; max-width:600px; border:1px solid #e2e8f0; border-radius:12px; padding:24px; color:#1e293b;">
+            <p>Hi ${safeName},</p>
+            <p>Thanks for contacting me! I've received your message regarding <strong>"${safeSubject}"</strong> and I'll get back to you as soon as possible.</p>
+            <p>In the meantime, feel free to check out more of my work on my portfolio.</p>
+            <br/>
+            <p>Best regards,<br/><strong>Akintek David</strong></p>
+          </div>
+        `,
+      }).catch(err => console.error("⚠️ Auto-reply failed:", err.message));
 
       const duration = Date.now() - startTime;
       console.info(`✅ Message processed in ${duration}ms`);

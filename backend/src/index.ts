@@ -25,7 +25,10 @@ app.use(
 
       if (!origin) return callback(null, true);
 
-      if (allowedOrigins.includes(origin)) {
+      const isNetlify = origin.endsWith(".netlify.app");
+      const isAllowed = allowedOrigins.includes(origin);
+
+      if (isNetlify || isAllowed) {
         return callback(null, true);
       }
 
