@@ -58,16 +58,18 @@ interface ContactRequestBody {
 
 // ─── SMTP TRANSPORTER ────────────────────────────────────────
 const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || "smtp.gmail.com",
-  port: parseInt(process.env.SMTP_PORT || "465"),
-  secure: process.env.SMTP_SECURE === "true" || process.env.SMTP_PORT === "465",
+  host: "smtp.gmail.com", // Using direct hostname for better stability
+  port: 465, // Forcing 465 as it's the most reliable on Render
+  secure: true,
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
   },
-  // Force IPv4 to fix potential ENETUNREACH errors on some hosts
+  // Hard-forcing IPv4 to stop the ENETUNREACH IPv6 errors
   // @ts-ignore
   family: 4,
+  connectionTimeout: 10000, // 10 seconds timeout
+  greetingTimeout: 10000,
 } as SMTPTransport.Options);
 
 // ─── ROUTE ───────────────────────────────────────────────────
