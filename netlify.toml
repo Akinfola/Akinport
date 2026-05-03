@@ -5,3 +5,9 @@
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
+
+[[redirects]]
+  from = "/api/contact"
+  to = "https://akinport.onrender.com/api/contact"
+  status = 200
+  force = true
