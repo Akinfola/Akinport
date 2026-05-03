@@ -45,11 +45,26 @@ export default function Contact() {
         body: JSON.stringify(form),
       });
 
-      const data = await res.json();
-
+      // 1. Check if the response is OK before parsing JSON
       if (!res.ok) {
-        throw new Error(data.message || 'Request failed');
+        const errorText = await res.text();
+        let errorMsg = 'Request failed';
+        try {
+          const errorJson = JSON.parse(errorText);
+          errorMsg = errorJson.message || errorMsg;
+        } catch {
+          errorMsg = `Server error: ${res.status}`;
+        }
+        throw new Error(errorMsg);
       }
+
+      // 2. Safely parse JSON
+      const text = await res.text();
+      if (!text) {
+        throw new Error('Empty response from server');
+      }
+
+      const data = JSON.parse(text);
 
       if (data.success) {
         setStatus('success');
