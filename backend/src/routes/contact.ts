@@ -124,17 +124,19 @@ contactRouter.post(
     }
 
     // ─── BACKGROUND EMAIL PROCESSING ────────────────────────────
-    // We respond immediately to avoid 504 Gateway Timeouts on Netlify/Render
+    console.log(`📩 Processing contact from: ${email}`);
+    
     res.status(200).json({
       success: true,
       message: "Message received! We are processing your request.",
     });
 
-    // Run the email sending in the background
     (async () => {
       try {
-        // 1. NOTIFICATION TO OWNER (Critical)
-        await transporter.sendMail({
+        console.log("⏳ Attempting to send email...");
+        
+        // 1. NOTIFICATION TO OWNER
+        const ownerResult = await transporter.sendMail({
           from: `"Portfolio Contact" <${process.env.SMTP_USER}>`,
           to: ownerEmail,
           replyTo: email,
@@ -152,9 +154,10 @@ contactRouter.post(
             </div>
           `,
         });
+        console.log("📨 Owner notification sent:", ownerResult.messageId);
 
-        // 2. AUTO-REPLY TO SENDER (Non-critical)
-        await transporter.sendMail({
+        // 2. AUTO-REPLY TO SENDER
+        const replyResult = await transporter.sendMail({
           from: `"Akintek" <${process.env.SMTP_USER}>`,
           to: email,
           subject: `Thanks for reaching out!`,
@@ -162,18 +165,17 @@ contactRouter.post(
             <div style="font-family:sans-serif; max-width:600px; border:1px solid #e2e8f0; border-radius:12px; padding:24px; color:#1e293b;">
               <p>Hi ${safeName},</p>
               <p>Thanks for contacting me! I've received your message regarding <strong>"${safeSubject}"</strong> and I'll get back to you as soon as possible.</p>
-              <p>In the meantime, feel free to check out more of my work on my portfolio.</p>
               <br/>
               <p>Best regards,<br/><strong>Akintek David</strong></p>
             </div>
           `,
         });
+        console.log("📨 Auto-reply sent:", replyResult.messageId);
 
-        const duration = Date.now() - startTime;
-        console.info(`✅ Message processed in ${duration}ms`);
+        console.info(`✅ All emails processed in ${Date.now() - startTime}ms`);
 
       } catch (error: any) {
-        console.error("❌ Background SMTP Error:", error.message);
+        console.error("❌ SMTP Error Detail:", error);
       }
     })();
   }
