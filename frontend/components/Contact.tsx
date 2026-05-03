@@ -37,13 +37,16 @@ export default function Contact() {
     setErrorMessage('');
 
     try {
-      const res = await fetch('/api/contact', {
+      // Add a timestamp to bypass any accidental caching by the proxy
+      const res = await fetch(`/api/contact?t=${Date.now()}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(form),
       });
+
+      console.log('Response Status:', res.status);
 
       // 1. Check if the response is OK before parsing JSON
       if (!res.ok) {
