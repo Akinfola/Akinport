@@ -97,8 +97,8 @@ function autoReplyHTML(name: string, subject: string) {
       <br/>
       <p style="margin:0;">Best regards,</p>
       <p style="margin:4px 0 0;font-weight:bold;color:#0ea5e9;">Akintek David</p>
-      <p style="font-size:11px;color:#94a3b8;margin-top:24px;">
-        This is an automated reply. Please do not reply to this email directly.
+      <p style="font-size:11px;color:#94a3b8;margin-top:24px;border-top:1px solid #f1f5f9;padding-top:12px;">
+        <strong>Note:</strong> If you don't see my future replies in your inbox, please check your <strong>Spam</strong> or <strong>Promotions</strong> folder.
       </p>
     </div>
   `;
