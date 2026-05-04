@@ -229,8 +229,7 @@ export default function Contact() {
             </h2>
 
             <p className="text-gray-500 mb-6">
-              Your message has been delivered successfully. I'll get back to you soon! 
-              <br />
+              Your message has been delivered successfully. I'll get back to you soon!
               <span className="text-xs text-gray-400 mt-2 block">
                 (Please check your <b>Spam</b> folder if you don't see my reply).
               </span>
