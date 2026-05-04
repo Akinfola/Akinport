@@ -96,7 +96,7 @@ function autoReplyHTML(name: string, subject: string) {
       <p>In the meantime, feel free to explore more of my work on my portfolio.</p>
       <br/>
       <p style="margin:0;">Best regards,</p>
-      <p style="margin:4px 0 0;font-weight:bold;color:#0ea5e9;">Akintek David</p>
+      <p style="margin:4px 0 0;font-weight:bold;color:#0ea5e9;">Akintek⚡</p>
     </div>
   `;
 }
