@@ -11,7 +11,7 @@ const summary = {
     '+234 701 891 1593',
     'ejideayodele@gmail.com',
     'GitHub: github.com/Akinfola',
-    'Portfolio: akintek/netlify.app',
+    'Portfolio: akintek/netlify.app'
   ],
 };
 
