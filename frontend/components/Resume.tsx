@@ -10,8 +10,8 @@ const summary = {
     'Lagos, Nigeria',
     '+234 701 891 1593',
     'ejideayodele@gmail.com',
-    'GitHub: github.com/Akinfola', // replace
-    // 'Portfolio: yourportfolio.com', // replace
+    'GitHub: github.com/Akinfola',
+    'Portfolio: akintek/netlify.app',
   ],
 };
 
