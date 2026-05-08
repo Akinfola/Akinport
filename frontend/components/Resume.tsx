@@ -78,7 +78,7 @@ const projects = [
     title: 'QR Code Generator',
     description:
       'A simple web app that generates QR codes instantly from user input, focusing on usability and responsiveness.',
-    link: 'https://my-qrcode1.netlify.app/',
+    link: 'https://q-rcode-generator-xi.vercel.app/',
   },
   {
     title: 'DSA Practice Platform',

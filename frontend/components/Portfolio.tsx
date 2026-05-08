@@ -12,8 +12,8 @@ const items = [
     category: "app",
     description: "A web application that generates QR codes for text, URLs, phone numbers, and more.",
     image: "/assets/QR-code.png",
-    previewLink: "https://my-qrcode1.netlify.app/",
-    liveLink: "https://my-qrcode1.netlify.app/"
+    previewLink: "https://q-rcode-generator-xi.vercel.app/",
+    liveLink: "https://q-rcode-generator-xi.vercel.app/"
   },
 
   {
